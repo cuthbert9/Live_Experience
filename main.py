@@ -18,7 +18,7 @@ app.add_middleware(
     allow_headers=["*"],
 )
 
-database_model.Base.metadata.create_all(bind=engine)
+# database_model.Base.metadata.create_all(bind=engine)
 
 def get_db():
     db = SessionLocal()
