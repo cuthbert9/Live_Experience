@@ -42,16 +42,22 @@ def get_events(db:session=Depends(get_db)):
 @app.post("/events")
 def create_event(event:models.EventCreate,db:session=Depends(get_db)):
     db_event=database_model.Event(
-        title=event.title,
-        description=event.description,
-        event_date=event.event_date,
+       title=event.title,
+       description=event.description,
+       genre=event.genre,
+       venue_id=event.venue_id,
+       organizer_id=event.organizer_id,
+       date=event.date,
        start_time=event.start_time,
-         end_time=event.end_time,
-        venue_id=event.venue_id, 
-        entry_fee=event.entry_fee,
-        music_type=event.music_type,
-        poster_image="",
-        status="pending",
+       end_time=event.end_time,
+       door_time=event.door_time,
+       age_restriction=event.age_restriction,
+       is_free_event=event.is_free_event,
+       ticket_tiers=event.ticket_tiers,
+       poster_image=event.poster_image,
+       artist_name=event.artist_name,
+       artist_bio=event.artist_bio,
+       social_links=event.social_links            
 
 
     )
