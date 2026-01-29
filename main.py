@@ -5,9 +5,6 @@ import database_model
 import models
 from sqlalchemy.orm import session
 
-
-
-
 app = FastAPI()
 
 app.add_middleware(
@@ -25,7 +22,7 @@ def get_db():
     try:
         yield db
     finally:
-        db.close()     
+        db.close()   
 
 
 
@@ -38,6 +35,15 @@ def test():
 def get_events(db:session=Depends(get_db)):
     events=db.query(database_model.Event).all()
     return events
+
+@app.get("/events/{event_id}")
+def get_event_by_Id(event_id:int,db:session=Depends(get_db)):
+    event=db.query(database_model.Event).filter(database_model.Event.id==event_id).first()
+    return event
+
+@app.get("events")
+def get_event_by_genre (event_genre:str , db:session=Depends(get_db)):
+    events=db.query(database_model.Event).filter(database_model.Event.genre.contains([event_genre])).all()
 
 @app.post("/events")
 def create_event(event:models.EventCreate,db:session=Depends(get_db)):
@@ -57,8 +63,7 @@ def create_event(event:models.EventCreate,db:session=Depends(get_db)):
        poster_image=event.poster_image,
        artist_name=event.artist_name,
        artist_bio=event.artist_bio,
-       social_links=event.social_links            
-
+       social_links=event.social_links         
 
     )
     db.add(db_event)  
@@ -67,8 +72,68 @@ def create_event(event:models.EventCreate,db:session=Depends(get_db)):
     return db_event  
 
 
+
 @app.get("/venues")     
 def get_venues(db:session=Depends(get_db)):
     venues=db.query(database_model.Venue).all()
     return venues   
+
+@app.post("/venues")
+def create_venue(venue:models.VenueCreate,db:session=Depends(get_db )):
+    db_venue=database_model.Venue(
+       name=venue.name,
+       address=venue.address,
+       city=venue.city,
+       state=venue.state,
+       zip_code=venue.zip_code,
+       capacity=venue.capacity,
+       description=venue.description,
+       social_links=venue.social_links,
+       stats=venue.stats
+    )
+    db.add(db_venue)  
+    db.commit()  
+    db.refresh(db_venue)
+    return db_venue
+
+@app.get("/venues/{venue_id}")
+def get_venue_by_Id(venue_id:int,db:session=Depends(get_db)):
+    venue=db.query(database_model.Venue).filter(database_model.Venue.id==venue_id).first()
+    return venue
+
+
+
+@app.get("/artists")     
+def get_artists(db:session=Depends(get_db)):
+    artists=db.query(database_model.Artist).all()
+    return artists  
+
+@app.get("/artists/{artist_id}")
+def get_artist_by_id(artist_id:int,db:session=Depends(get_db)):
+    artist=db.query(database_model.Artist).filter(database_model.Artist.id==artist_id).first()
+    return artist
+
+
+@app.post("/artists")
+def create_artist(artist:models.ArtistCreate,db:session=Depends(get_db )):
+    db_artist=database_model.Artist(
+       name=artist.name,
+       bio=artist.bio,
+       genre=artist.genre,
+       social_links=artist.social_links,
+       stats=artist.stats
+    )
+    db.add(db_artist)  
+    db.commit()  
+    db.refresh(db_artist)
+    return db_artist
+
+
+
+@app.get("/users/{user_id}")
+def get_user(user_id:int,db:session=Depends(get_db)):
+    user=db.query(database_model.User).filter(database_model.User.id==user_id).first()
+    return user
+
+
 

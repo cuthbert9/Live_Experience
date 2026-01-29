@@ -56,7 +56,7 @@ class VenueResponse(VenueBase):
 
 class ArtistBase(BaseModel):
     name: str
-    genre: Optional[str] = None
+    genre: Optional [List[str]] = None
     followers: Optional[str] = None
 
     bio: Optional[str] = None
@@ -83,7 +83,7 @@ class ArtistResponse(ArtistBase):
 class EventBase(BaseModel):
     title: str
     description: Optional[str] = None
-    genre: Optional[str] = None
+    genre: Optional[List[str]] = None
 
     venue_id: int
     organizer_id: int

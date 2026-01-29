@@ -1,5 +1,5 @@
 from sqlalchemy.ext.declarative import declarative_base
-from sqlalchemy import Column, Integer, String, Date, Time, Float, Boolean, ForeignKey, Text,JSON
+from sqlalchemy import Column, Integer, String, Date, Time, Float, Boolean, ForeignKey, Text,JSON,Table
 from sqlalchemy.orm import relationship
 
 Base = declarative_base()
@@ -66,7 +66,7 @@ class Artist(Base):
 
     # Basic identity
     name = Column(String, nullable=False)
-    genre = Column(String)
+    genre = Column(JSON)
 
     # Popularity
     followers = Column(String)  # e.g. "125K"
@@ -94,7 +94,7 @@ class Event(Base):
     id = Column(Integer, primary_key=True, index=True)
     title = Column(String, nullable=False)
     description = Column(Text)
-    genre = Column(String)  # e.g., jazz, rock, pop
+    genre = Column(JSON)  # e.g., jazz, rock, pop
     venue_id = Column(Integer, ForeignKey("venues.id"))
     organizer_id = Column(Integer, ForeignKey("users.id"))
 
@@ -149,6 +149,25 @@ class Review(Base):
     event = relationship("Event", back_populates="reviews")
 
 
+
+
+#     # Association tables
+# user_follow_artist = Table(
+#     'user_follow_artist', Base.metadata,
+#     Column('user_id', Integer, ForeignKey('users.id')),
+#     Column('artist_id', Integer, ForeignKey('artists.id'))
+# )
+
+# user_follow_venue = Table(
+#     'user_follow_venue', Base.metadata,
+#     Column('user_id', Integer, ForeignKey('users.id')),
+#     Column('venue_id', Integer, ForeignKey('venues.id'))
+# )
+
+
+
+
+
     # in this platform artists can know where they are taged as perfomers ,somehow can solve fraud 
     # users also can their favourate artists schedule through the year 
     # users will know the venue history of hosting certain artists and future events 
@@ -158,5 +177,5 @@ class Review(Base):
     # also i could add a feature where users can follow artists and venues to get notified about new events
     # this will increase user engagement on the platform
     # also mybe in the future i could add wide category of events not just music events maybe art exhibitions , theater plays , comedy shows ,educaitonal etc
-    
+    # adding Weddings section for all weddings resources and vendors
     
