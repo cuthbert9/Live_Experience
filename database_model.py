@@ -1,6 +1,9 @@
 from sqlalchemy.ext.declarative import declarative_base
-from sqlalchemy import Column, Integer, String, Date, Time, Float, Boolean, ForeignKey, Text,JSON,Table
+from sqlalchemy import Column, Integer, String, Date, Time, Float, Boolean, ForeignKey, Text,JSON,Table,Enum as SQLEnum
 from sqlalchemy.orm import relationship
+from enums import UserRoleEnum,VenuetypeEnum,GenreEnum
+from sqlalchemy.dialects.postgresql import UUID
+import uuid
 
 Base = declarative_base()
 
@@ -9,12 +12,13 @@ Base = declarative_base()
 class User(Base):
     __tablename__ = 'users'
 
-    id = Column(Integer, primary_key=True, index=True)
+    id = Column(UUID(as_uuid=True), primary_key=True,default=uuid.uuid4)
     full_name = Column(String, nullable=False)
     email = Column(String, unique=True, index=True, nullable=False)
     phone = Column(String, unique=True)
     password_hash = Column(String, nullable=False)
-    role = Column(String, default="user")  # user, organizer, admin
+    role = Column(SQLEnum(UserRoleEnum,name="user_role_enum"),default=UserRoleEnum.USER ,
+                  nullable=False)  # user, organizer, admin
     created_at = Column(String)
 
     events = relationship("Event", back_populates="organizer")
@@ -26,11 +30,11 @@ class User(Base):
 class Venue(Base):
     __tablename__ = "venues"
 
-    id = Column(Integer, primary_key=True, index=True)
+    id = Column(UUID(as_uuid=True), primary_key=True, default=uuid.uuid4)
 
     # Basic info
     name = Column(String, nullable=False)
-    type = Column(String)  # e.g. Jazz Club, Bar, Arena
+    type = Column(SQLEnum(VenuetypeEnum ,name="venue_type_enum"),default=VenuetypeEnum.HALL)  # e.g. Jazz Club, Bar, Arena
     description = Column(Text)
 
     address = Column(String)
@@ -51,7 +55,7 @@ class Venue(Base):
 
     capacity = Column(Integer)
 
-    owner_id = Column(Integer, ForeignKey("users.id"))
+    owner_id = Column(UUID(as_uuid=True), ForeignKey("users.id"))
 
     # Relationships
     events = relationship("Event", back_populates="venue")
@@ -61,25 +65,15 @@ class Venue(Base):
 
 class Artist(Base):
     __tablename__ = "artists"
-
-    id = Column(Integer, primary_key=True, index=True)
-
-    # Basic identity
+    id = Column(UUID(as_uuid=True), primary_key=True, default=uuid.uuid4)   
     name = Column(String, nullable=False)
-    genre = Column(JSON)
-
-    # Popularity
+    genre = Column(JSON)  
     followers = Column(String)  # e.g. "125K"
-
-    # Descriptions
     bio = Column(Text)
     long_bio = Column(Text)
-
     # Images
-    image = Column(String)
+    images = Column(JSON)
     cover_image = Column(String)
-
-    # Structured data
     social_links = Column(JSON)
     stats = Column(JSON)
 
@@ -91,12 +85,12 @@ class Artist(Base):
 class Event(Base):
     __tablename__ = 'events'
 
-    id = Column(Integer, primary_key=True, index=True)
+    id = Column(UUID(as_uuid=True), primary_key=True, default=uuid.uuid4)
     title = Column(String, nullable=False)
     description = Column(Text)
-    genre = Column(JSON)  # e.g., jazz, rock, pop
-    venue_id = Column(Integer, ForeignKey("venues.id"))
-    organizer_id = Column(Integer, ForeignKey("users.id"))
+    genre = Column(JSON)  # e.g., jazz,CCM , christian/gospel 
+    venue_id = Column(UUID(as_uuid=True), ForeignKey("venues.id"))
+    organizer_id = Column(UUID(as_uuid=True), ForeignKey("users.id"))
 
     date = Column(Date)
     start_time = Column(Time)
@@ -127,9 +121,9 @@ class Event(Base):
 class EventArtist(Base):
     __tablename__ = 'event_artists'
 
-    id = Column(Integer, primary_key=True, index=True)
-    event_id = Column(Integer, ForeignKey("events.id"))
-    artist_id = Column(Integer, ForeignKey("artists.id"))
+    id = Column(UUID(as_uuid=True), primary_key=True, default=uuid.uuid4)
+    event_id = Column(UUID(as_uuid=True), ForeignKey("events.id"))
+    artist_id = Column(UUID(as_uuid=True), ForeignKey("artists.id"))
 
     event = relationship("Event", back_populates="artists")
 
@@ -138,12 +132,12 @@ class EventArtist(Base):
 class Review(Base):
     __tablename__ = 'reviews'
 
-    id = Column(Integer, primary_key=True, index=True)
+    id = Column(UUID(as_uuid=True), primary_key=True, default=uuid.uuid4)
     rating = Column(Integer)  
     comment = Column(Text)
 
-    user_id = Column(Integer, ForeignKey("users.id"))
-    event_id = Column(Integer, ForeignKey("events.id"))
+    user_id = Column(UUID(as_uuid=True), ForeignKey("users.id"))
+    event_id = Column(UUID(as_uuid=True), ForeignKey("events.id"))
 
     user = relationship("User", back_populates="reviews")
     event = relationship("Event", back_populates="reviews")

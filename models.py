@@ -1,13 +1,16 @@
 from pydantic import BaseModel
 from typing import List, Optional, Dict, Any
 from datetime import date, time
+from enums import UserRoleEnum,VenuetypeEnum,GenreEnum
+from uuid import UUID
+
 
 
 class UserBase(BaseModel):
     full_name: str
     email: str
-    phone: Optional[str] = None
-    role: Optional[str] = "user"
+    phone: Optional[str] 
+    role: UserRoleEnum=UserRoleEnum.USER
 
 
 class UserCreate(UserBase):
@@ -15,7 +18,7 @@ class UserCreate(UserBase):
 
 
 class UserResponse(UserBase):
-    id: int
+    id: UUID
 
     class Config:
         from_attributes = True
@@ -24,12 +27,12 @@ class UserResponse(UserBase):
 
 class VenueBase(BaseModel):
     name: str
-    type: Optional[str] = None
-    description: Optional[str] = None
+    type: VenuetypeEnum=VenuetypeEnum.HALL
+    description: Optional[str] 
 
-    address: Optional[str] = None
-    phone: Optional[str] = None
-    website: Optional[str] = None
+    address: Optional[str] 
+    phone: Optional[str] 
+    website: Optional[str] =None
 
     latitude: Optional[float] = None
     longitude: Optional[float] = None
@@ -42,11 +45,11 @@ class VenueBase(BaseModel):
 
 
 class VenueCreate(VenueBase):
-    owner_id: Optional[int] = None
+    owner_id: Optional[UUID] = None
 
 
 class VenueResponse(VenueBase):
-    id: int
+    id: UUID
     rating: float
     reviews_count: int
 
@@ -62,7 +65,7 @@ class ArtistBase(BaseModel):
     bio: Optional[str] = None
     long_bio: Optional[str] = None
 
-    image: Optional[str] = None
+    images: Optional[List[str]] = None
     cover_image: Optional[str] = None
 
     social_links: Optional[Dict[str, Any]] = None
@@ -74,7 +77,7 @@ class ArtistCreate(ArtistBase):
 
 
 class ArtistResponse(ArtistBase):
-    id: int
+    id: UUID
 
     class Config:
         from_attributes = True
@@ -85,24 +88,24 @@ class EventBase(BaseModel):
     description: Optional[str] = None
     genre: Optional[List[str]] = None
 
-    venue_id: int
-    organizer_id: int
+    venue_id: UUID
+    organizer_id: UUID
 
-    date: Optional[date] = None
-    start_time: Optional[time] = None
-    end_time: Optional[time] = None
-    door_time: Optional[time] = None
+    date: date
+    start_time: time
+    end_time: time
+    door_time: time
 
-    age_restriction: Optional[str] = None
-    is_free_event: bool = False
+    age_restriction: Optional[str] 
+    is_free_event: bool = True
 
     ticket_tiers: Optional[List[Dict[str, Any]]] = None
 
-    poster_image: Optional[str] = None
+    poster_image: Optional[str] 
 
-    artist_name: Optional[str] = None
-    artist_bio: Optional[str] = None
-    social_links: Optional[Dict[str, Any]] = None
+    artist_name: str 
+    artist_bio: Optional[str]
+    social_links: Optional[Dict[str, str]] 
 
 
 class EventCreate(EventBase):
@@ -110,7 +113,7 @@ class EventCreate(EventBase):
 
 
 class EventResponse(EventBase):
-    id: int
+    id: UUID
     is_published: bool
 
     class Config:
@@ -125,13 +128,13 @@ class ReviewBase(BaseModel):
 
 
 class ReviewCreate(ReviewBase):
-    event_id: int
+    event_id: UUID
 
 
 class ReviewResponse(ReviewBase):
-    id: int
-    user_id: int
-    event_id: int
+    id: UUID
+    user_id: UUID
+    event_id: UUID
 
     class Config:
         from_attributes = True

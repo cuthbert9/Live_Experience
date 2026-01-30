@@ -119,9 +119,13 @@ def create_artist(artist:models.ArtistCreate,db:session=Depends(get_db )):
     db_artist=database_model.Artist(
        name=artist.name,
        bio=artist.bio,
+       followers=artist.followers,
        genre=artist.genre,
        social_links=artist.social_links,
-       stats=artist.stats
+       stats=artist.stats,
+       cover_image=artist.cover_image,
+       images=artist.images
+       
     )
     db.add(db_artist)  
     db.commit()  
