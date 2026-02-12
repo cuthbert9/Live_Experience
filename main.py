@@ -1,3 +1,4 @@
+from http.client import HTTPException
 from fastapi import FastAPI,Depends
 from database import SessionLocal, engine  
 from fastapi.middleware.cors import CORSMiddleware
@@ -159,7 +160,9 @@ def register_user(user:models.UserCreate,db:session=Depends(get_db)):
 @app.post("/login")
 def login(email:str ,password:str ,db:session=Depends(get_db)):
     user=db.query(database_model.User).filter(database_model.User.email==email).first()
-    if user and user.password_hash==password:
-        return {"message":"Login successful"}
-    else:
-        return {"message":"Invalid credentials"}    
+    if not user:
+        raise HTTPException(status_code=401, detail="Invalid credentials")
+    if not verify_password(password,user.password_hash):
+        raise HTTPException(status_code=401, detail="Invalid credentials")
+    token=create_token({"user_id":str(user.id)})
+    return {"access_token":token,"token_type":"bearer"}
