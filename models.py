@@ -11,6 +11,8 @@ class UserBase(BaseModel):
     email: str
     phone: Optional[str] 
     role: UserRoleEnum=UserRoleEnum.USER
+    following_artists: Optional[List[UUID]] = None
+    following_venues: Optional[List[UUID]] = None
 
 
 class UserCreate(UserBase):
@@ -42,6 +44,7 @@ class VenueBase(BaseModel):
     images: Optional[List[str]] = None
 
     capacity: Optional[int] = None
+    venue_followers: Optional[List[UUID]] = None
 
 
 class VenueCreate(VenueBase):
@@ -60,7 +63,7 @@ class VenueResponse(VenueBase):
 class ArtistBase(BaseModel):
     name: str
     genre: Optional [List[str]] = None
-    followers: Optional[str] = None
+    followers_count: Optional[str] = None
 
     bio: Optional[str] = None
     long_bio: Optional[str] = None
@@ -70,6 +73,7 @@ class ArtistBase(BaseModel):
 
     social_links: Optional[Dict[str, Any]] = None
     stats: Optional[Dict[str, Any]] = None
+    followers: Optional[List[UUID]] = None
 
 
 class ArtistCreate(ArtistBase):

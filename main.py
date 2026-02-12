@@ -4,6 +4,7 @@ from fastapi.middleware.cors import CORSMiddleware
 import database_model
 import models
 from sqlalchemy.orm import session
+from security.security import create_token,hash_password,verify_password
 
 app = FastAPI()
 
@@ -140,4 +141,25 @@ def get_user(user_id:int,db:session=Depends(get_db)):
     return user
 
 
+@app.post("/register")
+def register_user(user:models.UserCreate,db:session=Depends(get_db)):
 
+    db_user=database_model.User(
+        full_name=user.full_name,
+        email=user.email,
+        password_hash=user.password_hash
+    )
+
+    db.add(db_user)
+    db.commit()
+    db.refresh(db_user)
+    return db_user
+
+
+@app.post("/login")
+def login(email:str ,password:str ,db:session=Depends(get_db)):
+    user=db.query(database_model.User).filter(database_model.User.email==email).first()
+    if user and user.password_hash==password:
+        return {"message":"Login successful"}
+    else:
+        return {"message":"Invalid credentials"}    

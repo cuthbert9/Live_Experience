@@ -21,6 +21,10 @@ class User(Base):
                   nullable=False)  # user, organizer, admin
     created_at = Column(String)
 
+    following_artists=relationship("Artist",secondary="user_follow_artist",back_populates="followers")
+
+    following_venues=relationship("Venue",secondary="user_follow_venue",back_populates="venue_followers")
+
     events = relationship("Event", back_populates="organizer")
     reviews = relationship("Review", back_populates="user")
 
@@ -58,7 +62,9 @@ class Venue(Base):
     owner_id = Column(UUID(as_uuid=True), ForeignKey("users.id"))
 
     # Relationships
-    events = relationship("Event", back_populates="venue")
+    events = relationship("Event", back_populates="venue")   
+
+    venue_followers=relationship("User",secondary="user_follow_venue",back_populates="following_venues")
 
 
 
@@ -68,7 +74,7 @@ class Artist(Base):
     id = Column(UUID(as_uuid=True), primary_key=True, default=uuid.uuid4)   
     name = Column(String, nullable=False)
     genre = Column(JSON)  
-    followers = Column(String)  # e.g. "125K"
+    followers_count = Column(String)  # e.g. "125K"
     bio = Column(Text)
     long_bio = Column(Text)
     # Images
@@ -77,6 +83,7 @@ class Artist(Base):
     social_links = Column(JSON)
     stats = Column(JSON)
 
+    followers=relationship("User",secondary ="user_follow_artist" , back_populates="following_artists")
 
 
 
@@ -97,15 +104,15 @@ class Event(Base):
     end_time = Column(Time)
     door_time = Column(Time)
 
-    age_restriction = Column(String)  # e.g., "21+"
-    is_free_event = Column(Boolean, default=False)
+    age_restriction = Column(String ,default="18")  # e.g., "21+"
+    is_free_event = Column(Boolean, default=True)
     ticket_tiers = Column(JSON)  # stores list of ticket tiers as JSON
 
-    poster_image = Column(String)
+    poster_image = Column(String,default="https://example.com/default-poster.jpg")
 
     artist_name = Column(String)
-    artist_bio = Column(Text)
-    social_links = Column(JSON)  # stores website, instagram, spotify, etc.
+    artist_bio = Column(Text ,default="No bio available")
+    social_links = Column(JSON,default=lambda:{"socials":"  "})  # stores website, instagram, spotify, etc.
 
     is_published = Column(Boolean, default=False)
 
@@ -145,18 +152,18 @@ class Review(Base):
 
 
 
-#     # Association tables
-# user_follow_artist = Table(
-#     'user_follow_artist', Base.metadata,
-#     Column('user_id', Integer, ForeignKey('users.id')),
-#     Column('artist_id', Integer, ForeignKey('artists.id'))
-# )
+    # Association tables
+    user_follow_artist = Table(
+        'user_follow_artist', Base.metadata,
+        Column('user_id', UUID(as_uuid=True), ForeignKey('users.id')),
+        Column('artist_id', UUID(as_uuid=True), ForeignKey('artists.id'))
+    )
 
-# user_follow_venue = Table(
-#     'user_follow_venue', Base.metadata,
-#     Column('user_id', Integer, ForeignKey('users.id')),
-#     Column('venue_id', Integer, ForeignKey('venues.id'))
-# )
+    user_follow_venue = Table(
+        'user_follow_venue', Base.metadata,
+        Column('user_id', UUID(as_uuid=True), ForeignKey('users.id')),
+        Column('venue_id', UUID(as_uuid=True), ForeignKey('venues.id'))
+    )
 
 
 
